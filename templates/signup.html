@@ -1,0 +1,64 @@
+<section class="auth-section">
+    <div class="glass-card">
+        <h2>Ro'yxatdan o'tish</h2>
+
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            {% for field in form %}
+                <div class="input-group">
+                    <label>{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <span class="error-text">{{ field.errors.0 }}</span>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            <button type="submit" class="btn-neon">Hisob yaratish</button>
+        </form>
+
+        <p>Accountingiz bormi? <a href="{% url 'login' %}">Kirish</a></p>
+    </div>
+</section>
+
+<style>
+/* Modern Glassmorphism Dizayn */
+.glass-card {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 2rem;
+    border-radius: 20px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    color: white;
+}
+
+.form-input-modern {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid #4facfe; /* Neon rang */
+    padding: 10px;
+    border-radius: 8px;
+    color: white;
+    outline: none;
+    transition: 0.3s;
+}
+
+.form-input-modern:focus {
+    box-shadow: 0 0 10px #00f2fe;
+}
+
+.btn-neon {
+    width: 100%;
+    padding: 12px;
+    margin-top: 15px;
+    border: none;
+    border-radius: 8px;
+    background: linear-gradient(45deg, #00f2fe 0%, #4facfe 100%);
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    text-transform: uppercase;
+}
+</style>

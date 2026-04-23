@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block title %}Yangi Operatsiya — BankCalc{% endblock %}
+
+{% block content %}
+<div style="max-width: 580px; margin: 0 auto;">
+    <div class="page-header">
+        <div>
+            <div class="page-title">Yangi Operatsiya</div>
+            <div class="page-subtitle">Kirim yoki chiqim qo'shing</div>
+        </div>
+        <a href="{% url 'dashboard' %}" class="btn btn-ghost">← Orqaga</a>
+    </div>
+
+    <div class="card">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            {% for field in form %}
+            <div class="form-group">
+                <label class="form-label">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}
+                    <div class="error-text">{{ field.errors.0 }}</div>
+                {% endif %}
+                {% if field.help_text %}
+                    <div class="text-muted" style="font-size: 0.78rem; margin-top: 4px;">{{ field.help_text }}</div>
+                {% endif %}
+            </div>
+            {% endfor %}
+
+            <div class="divider"></div>
+
+            <button type="submit" class="btn btn-primary w-full" style="justify-content: center;">
+                Saqlash
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

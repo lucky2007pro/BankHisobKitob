@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% block title %}Hisobot — BankCalc{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <div class="page-title">Hisobot</div>
+        <div class="page-subtitle">Barcha moliyaviy operatsiyalar</div>
+    </div>
+    <a href="{% url 'transaction_add' %}" class="btn btn-primary">+ Yangi operatsiya</a>
+</div>
+
+<!-- FILTER -->
+<div class="card mb-2" style="margin-bottom: 1.5rem;">
+    <form method="get" style="display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 140px;">
+            <label class="form-label">Yil</label>
+            <select name="year" class="form-select">
+                <option value="">Barchasi</option>
+                {% for y in "2023 2024 2025 2026"|split:" " %}
+                <option value="{{ y }}" {% if request.GET.year == y %}selected{% endif %}>{{ y }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div style="flex: 1; min-width: 140px;">
+            <label class="form-label">Oy</label>
+            <select name="month" class="form-select">
+                <option value="">Barchasi</option>
+                {% for m in "1 2 3 4 5 6 7 8 9 10 11 12"|split:" " %}
+                <option value="{{ m }}" {% if request.GET.month == m %}selected{% endif %}>{{ m }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div style="flex: 1; min-width: 140px;">
+            <label class="form-label">Tur</label>
+            <select name="type" class="form-select">
+                <option value="">Barchasi</option>
+                <option value="INCOME" {% if request.GET.type == "INCOME" %}selected{% endif %}>Kirim</option>
+                <option value="EXPENSE" {% if request.GET.type == "EXPENSE" %}selected{% endif %}>Chiqim</option>
+            </select>
+        </div>
+        <div style="display: flex; gap: 0.5rem;">
+            <button type="submit" class="btn btn-primary">Filter</button>
+            <a href="{% url 'transaction_list' %}" class="btn btn-ghost">Tozalash</a>
+        </div>
+    </form>
+</div>
+
+<!-- TABLE -->
+<div class="card">
+    {% if transactions %}
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Sana</th>
+                    <th>Tur</th>
+                    <th>Kategoriya</th>
+                    <th>Hisob</th>
+                    <th>Summa</th>
+                    <th>Izoh</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for t in transactions %}
+                <tr>
+                    <td class="text-mono" style="font-size: 0.8rem; color: var(--text-muted);">{{ t.date|date:"d.m.Y H:i" }}</td>
+                    <td>
+                        {% if t.transaction_type == 'INCOME' %}
+                            <span class="badge badge-income">↑ Kirim</span>
+                        {% else %}
+                            <span class="badge badge-expense">↓ Chiqim</span>
+                        {% endif %}
+                    </td>
+                    <td style="color: var(--text-muted); font-size: 0.875rem;">{{ t.category.name|default:"—" }}</td>
+                    <td style="font-size: 0.875rem;">{{ t.account.name }}</td>
+                    <td class="{% if t.transaction_type == 'INCOME' %}amount-income{% else %}amount-expense{% endif %}">
+                        {% if t.transaction_type == 'INCOME' %}+{% else %}-{% endif %}{{ t.amount|floatformat:0 }} UZS
+                    </td>
+                    <td style="color: var(--text-muted); font-size: 0.8rem; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                        {{ t.comment|default:"—" }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="icon">📋</div>
+        <h3>Operatsiyalar topilmadi</h3>
+        <p>Filter o'zgartiring yoki yangi operatsiya qo'shing</p>
+        <br>
+        <a href="{% url 'transaction_add' %}" class="btn btn-primary">+ Yangi operatsiya</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

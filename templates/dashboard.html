@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard — BankCalc{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <div class="page-title">Dashboard</div>
+        <div class="page-subtitle">Moliyaviy ko'rinish va hisobot</div>
+    </div>
+    <a href="{% url 'transaction_add' %}" class="btn btn-primary">
+        <span>+</span> Yangi operatsiya
+    </a>
+</div>
+
+<!-- MAIN STATS -->
+<div class="stat-grid" style="grid-template-columns: repeat(3, 1fr);">
+    <div class="stat-card stat-income">
+        <div class="label">Jami Kirim</div>
+        <div class="value">{{ total_income|floatformat:0 }}</div>
+        <div class="sub">UZS</div>
+    </div>
+    <div class="stat-card stat-expense">
+        <div class="label">Jami Chiqim</div>
+        <div class="value">{{ total_expense|floatformat:0 }}</div>
+        <div class="sub">UZS</div>
+    </div>
+    <div class="stat-card stat-balance">
+        <div class="label">Balans</div>
+        <div class="value" style="color: {% if net_balance >= 0 %}var(--green){% else %}var(--red){% endif %}">
+            {% if net_balance >= 0 %}+{% endif %}{{ net_balance|floatformat:0 }}
+        </div>
+        <div class="sub">UZS</div>
+    </div>
+</div>
+
+<!-- PERIOD STATS -->
+<div class="stat-grid" style="margin-bottom: 2rem;">
+    <div class="stat-card">
+        <div class="label">Bugun</div>
+        <div class="flex gap-2" style="gap: 1.5rem; margin-top: 0.5rem;">
+            <div>
+                <div style="font-size: 0.72rem; color: var(--green); font-family: var(--font-mono); margin-bottom: 2px;">KIRIM</div>
+                <div class="text-mono" style="color: var(--green);">+{{ daily_inc|floatformat:0 }}</div>
+            </div>
+            <div>
+                <div style="font-size: 0.72rem; color: var(--red); font-family: var(--font-mono); margin-bottom: 2px;">CHIQIM</div>
+                <div class="text-mono" style="color: var(--red);">-{{ daily_exp|floatformat:0 }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="label">Bu Hafta</div>
+        <div class="flex gap-2" style="gap: 1.5rem; margin-top: 0.5rem;">
+            <div>
+                <div style="font-size: 0.72rem; color: var(--green); font-family: var(--font-mono); margin-bottom: 2px;">KIRIM</div>
+                <div class="text-mono" style="color: var(--green);">+{{ weekly_inc|floatformat:0 }}</div>
+            </div>
+            <div>
+                <div style="font-size: 0.72rem; color: var(--red); font-family: var(--font-mono); margin-bottom: 2px;">CHIQIM</div>
+                <div class="text-mono" style="color: var(--red);">-{{ weekly_exp|floatformat:0 }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="label">Bu Oy</div>
+        <div class="flex gap-2" style="gap: 1.5rem; margin-top: 0.5rem;">
+            <div>
+                <div style="font-size: 0.72rem; color: var(--green); font-family: var(--font-mono); margin-bottom: 2px;">KIRIM</div>
+                <div class="text-mono" style="color: var(--green);">+{{ monthly_inc|floatformat:0 }}</div>
+            </div>
+            <div>
+                <div style="font-size: 0.72rem; color: var(--red); font-family: var(--font-mono); margin-bottom: 2px;">CHIQIM</div>
+                <div class="text-mono" style="color: var(--red);">-{{ monthly_exp|floatformat:0 }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="stat-card stat-gold">
+        <div class="label">Bu Yil</div>
+        <div class="flex gap-2" style="gap: 1.5rem; margin-top: 0.5rem;">
+            <div>
+                <div style="font-size: 0.72rem; color: var(--green); font-family: var(--font-mono); margin-bottom: 2px;">KIRIM</div>
+                <div class="text-mono" style="color: var(--green);">+{{ yearly_inc|floatformat:0 }}</div>
+            </div>
+            <div>
+                <div style="font-size: 0.72rem; color: var(--red); font-family: var(--font-mono); margin-bottom: 2px;">CHIQIM</div>
+                <div class="text-mono" style="color: var(--red);">-{{ yearly_exp|floatformat:0 }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- BOTTOM GRID -->
+<div class="grid-2">
+    <!-- ACCOUNTS -->
+    <div class="card">
+        <div class="flex justify-between items-center mb-2" style="margin-bottom: 1.25rem;">
+            <h3 class="text-mono" style="font-size: 0.85rem; color: var(--text-muted); letter-spacing: 0.08em; text-transform: uppercase;">Hisoblar</h3>
+        </div>
+        {% if accounts %}
+            {% for account in accounts %}
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px solid var(--border);">
+                <div>
+                    <div style="font-weight: 600; font-size: 0.9rem;">{{ account.name }}</div>
+                </div>
+                <div class="text-mono" style="font-weight: 700; color: var(--accent);">{{ account.balance|floatformat:0 }} UZS</div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="text-muted" style="text-align: center; padding: 2rem; font-size: 0.875rem;">Hisob mavjud emas</div>
+        {% endif %}
+    </div>
+
+    <!-- RECENT TRANSACTIONS -->
+    <div class="card">
+        <div class="flex justify-between items-center" style="margin-bottom: 1.25rem;">
+            <h3 class="text-mono" style="font-size: 0.85rem; color: var(--text-muted); letter-spacing: 0.08em; text-transform: uppercase;">So'nggi operatsiyalar</h3>
+            <a href="{% url 'transaction_list' %}" class="btn btn-ghost btn-sm">Barchasi</a>
+        </div>
+        {% if recent_transactions %}
+            {% for t in recent_transactions %}
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px solid var(--border);">
+                <div>
+                    <div style="font-size: 0.875rem; font-weight: 500;">{{ t.category.name|default:"—" }}</div>
+                    <div class="text-muted" style="font-size: 0.78rem; margin-top: 2px;">{{ t.date|date:"d.m.Y H:i" }}</div>
+                </div>
+                <div class="{% if t.transaction_type == 'INCOME' %}amount-income{% else %}amount-expense{% endif %}">
+                    {% if t.transaction_type == 'INCOME' %}+{% else %}-{% endif %}{{ t.amount|floatformat:0 }}
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state" style="padding: 2rem;">
+                <div class="icon">📊</div>
+                <p>Hali operatsiyalar yo'q</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
