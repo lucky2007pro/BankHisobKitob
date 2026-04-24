@@ -1,0 +1,58 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "username": "demo",
+      "password": "123"
+    }
+  ],
+  "accounts": [
+    {
+      "id": 1,
+      "user_id": 1,
+      "name": "Asosiy karta",
+      "type": "Karta",
+      "balance": 0
+    },
+    {
+      "id": 3,
+      "user_id": 1,
+      "name": "Naqt pul",
+      "type": "Naqt",
+      "balance": 0
+    }
+  ],
+  "categories": [
+    {
+      "id": 1,
+      "user_id": 1,
+      "name": "Oylik maosh",
+      "type": "Kirim"
+    },
+    {
+      "id": 3,
+      "user_id": 1,
+      "name": "Biznes",
+      "type": "Kirim"
+    },
+    {
+      "id": 6,
+      "user_id": 1,
+      "name": "Transport",
+      "type": "Chiqim"
+    },
+    {
+      "id": 10,
+      "user_id": 1,
+      "name": "Oziq-ovqat",
+      "type": "Chiqim"
+    },
+    {
+      "id": 15,
+      "user_id": 1,
+      "name": "Kafe",
+      "type": "Chiqim"
+    }
+  ],
+  "transactions": []
+}
