@@ -1,39 +1,48 @@
 {% extends 'base.html' %}
-{% block title %}Yangi Operatsiya — BankCalc{% endblock %}
+
+{% block title %}Operatsiya qo'shish{% endblock %}
 
 {% block content %}
-<div style="max-width: 580px; margin: 0 auto;">
-    <div class="page-header">
-        <div>
-            <div class="page-title">Yangi Operatsiya</div>
-            <div class="page-subtitle">Kirim yoki chiqim qo'shing</div>
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="glass-card mt-4">
+            <h3 class="mb-4 text-center">Yangi Operatsiya</h3>
+
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                {% for field in form %}
+                    <div class="mb-3">
+                        <label class="form-label text-muted">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.errors %}
+                            <div class="text-danger mt-1" style="font-size: 0.85rem;">{{ field.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+
+                <div class="d-grid gap-2 mt-4">
+                    <button type="submit" class="btn-neon">
+                        <i class="fa-solid fa-check"></i> Saqlash
+                    </button>
+                    <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">Bekor qilish</a>
+                </div>
+            </form>
         </div>
-        <a href="{% url 'dashboard' %}" class="btn btn-ghost">← Orqaga</a>
-    </div>
-
-    <div class="card">
-        <form method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-
-            {% for field in form %}
-            <div class="form-group">
-                <label class="form-label">{{ field.label }}</label>
-                {{ field }}
-                {% if field.errors %}
-                    <div class="error-text">{{ field.errors.0 }}</div>
-                {% endif %}
-                {% if field.help_text %}
-                    <div class="text-muted" style="font-size: 0.78rem; margin-top: 4px;">{{ field.help_text }}</div>
-                {% endif %}
-            </div>
-            {% endfor %}
-
-            <div class="divider"></div>
-
-            <button type="submit" class="btn btn-primary w-full" style="justify-content: center;">
-                Saqlash
-            </button>
-        </form>
     </div>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        let inputs = document.querySelectorAll('input, select, textarea');
+        inputs.forEach(function(input) {
+            if(input.type !== 'checkbox' && input.type !== 'file') {
+                input.classList.add('form-control');
+            }
+            if(input.tagName.toLowerCase() === 'select') {
+                input.classList.add('form-select');
+            }
+        });
+    });
+</script>
 {% endblock %}

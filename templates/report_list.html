@@ -1,98 +1,69 @@
 {% extends 'base.html' %}
-{% block title %}Hisobot — BankCalc{% endblock %}
+
+{% block title %}Hisobotlar{% endblock %}
 
 {% block content %}
-<div class="page-header">
-    <div>
-        <div class="page-title">Hisobot</div>
-        <div class="page-subtitle">Barcha moliyaviy operatsiyalar</div>
-    </div>
-    <a href="{% url 'transaction_add' %}" class="btn btn-primary">+ Yangi operatsiya</a>
-</div>
-
-<!-- FILTER -->
-<div class="card mb-2" style="margin-bottom: 1.5rem;">
-    <form method="get" style="display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap;">
-        <div style="flex: 1; min-width: 140px;">
-            <label class="form-label">Yil</label>
-            <select name="year" class="form-select">
-                <option value="">Barchasi</option>
-                {% for y in "2023 2024 2025 2026"|split:" " %}
-                <option value="{{ y }}" {% if request.GET.year == y %}selected{% endif %}>{{ y }}</option>
-                {% endfor %}
-            </select>
+<div class="glass-card mb-4">
+    <h4 class="mb-3"><i class="fa-solid fa-filter text-info"></i> Filtrlash</h4>
+    <form method="get" class="row g-3">
+        <div class="col-md-3">
+            <input type="number" name="year" class="form-control" placeholder="Yil (masalan: 2026)" value="{{ request.GET.year }}">
         </div>
-        <div style="flex: 1; min-width: 140px;">
-            <label class="form-label">Oy</label>
-            <select name="month" class="form-select">
-                <option value="">Barchasi</option>
-                {% for m in "1 2 3 4 5 6 7 8 9 10 11 12"|split:" " %}
-                <option value="{{ m }}" {% if request.GET.month == m %}selected{% endif %}>{{ m }}</option>
-                {% endfor %}
-            </select>
+        <div class="col-md-3">
+            <input type="number" name="month" class="form-control" placeholder="Oy (1-12)" value="{{ request.GET.month }}">
         </div>
-        <div style="flex: 1; min-width: 140px;">
-            <label class="form-label">Tur</label>
+        <div class="col-md-4">
             <select name="type" class="form-select">
-                <option value="">Barchasi</option>
-                <option value="INCOME" {% if request.GET.type == "INCOME" %}selected{% endif %}>Kirim</option>
-                <option value="EXPENSE" {% if request.GET.type == "EXPENSE" %}selected{% endif %}>Chiqim</option>
+                <option value="">Barcha turlar</option>
+                <option value="INCOME" {% if request.GET.type == 'INCOME' %}selected{% endif %}>Kirim</option>
+                <option value="EXPENSE" {% if request.GET.type == 'EXPENSE' %}selected{% endif %}>Chiqim</option>
             </select>
         </div>
-        <div style="display: flex; gap: 0.5rem;">
-            <button type="submit" class="btn btn-primary">Filter</button>
-            <a href="{% url 'transaction_list' %}" class="btn btn-ghost">Tozalash</a>
+        <div class="col-md-2 d-grid">
+            <button type="submit" class="btn btn-outline-info"><i class="fa-solid fa-magnifying-glass"></i> Qidirish</button>
         </div>
     </form>
 </div>
 
-<!-- TABLE -->
-<div class="card">
-    {% if transactions %}
-    <div class="table-wrap">
-        <table>
-            <thead>
+<div class="glass-card">
+    <h4 class="mb-4">Operatsiyalar tarixi</h4>
+    <div class="table-responsive">
+        <table class="table table-borderless text-light align-middle">
+            <thead class="text-muted" style="border-bottom: 1px solid rgba(255,255,255,0.1);">
                 <tr>
                     <th>Sana</th>
                     <th>Tur</th>
                     <th>Kategoriya</th>
-                    <th>Hisob</th>
+                    <th>Hamyon</th>
                     <th>Summa</th>
                     <th>Izoh</th>
                 </tr>
             </thead>
             <tbody>
-                {% for t in transactions %}
+                {% for tx in transactions %}
                 <tr>
-                    <td class="text-mono" style="font-size: 0.8rem; color: var(--text-muted);">{{ t.date|date:"d.m.Y H:i" }}</td>
+                    <td>{{ tx.date|date:"d.m.Y H:i" }}</td>
                     <td>
-                        {% if t.transaction_type == 'INCOME' %}
-                            <span class="badge badge-income">↑ Kirim</span>
+                        {% if tx.transaction_type == 'INCOME' %}
+                            <span class="badge bg-success bg-opacity-25 text-success border border-success rounded-pill px-3">Kirim</span>
                         {% else %}
-                            <span class="badge badge-expense">↓ Chiqim</span>
+                            <span class="badge bg-danger bg-opacity-25 text-danger border border-danger rounded-pill px-3">Chiqim</span>
                         {% endif %}
                     </td>
-                    <td style="color: var(--text-muted); font-size: 0.875rem;">{{ t.category.name|default:"—" }}</td>
-                    <td style="font-size: 0.875rem;">{{ t.account.name }}</td>
-                    <td class="{% if t.transaction_type == 'INCOME' %}amount-income{% else %}amount-expense{% endif %}">
-                        {% if t.transaction_type == 'INCOME' %}+{% else %}-{% endif %}{{ t.amount|floatformat:0 }} UZS
+                    <td>{{ tx.category.name|default:"-" }}</td>
+                    <td>{{ tx.account.name }}</td>
+                    <td class="fw-bold {% if tx.transaction_type == 'INCOME' %}text-success{% else %}text-danger{% endif %}">
+                        {{ tx.amount|floatformat:2 }}
                     </td>
-                    <td style="color: var(--text-muted); font-size: 0.8rem; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                        {{ t.comment|default:"—" }}
-                    </td>
+                    <td class="text-muted small">{{ tx.comment|truncatechars:30|default:"-" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center text-muted py-4">Bu vaqt oralig'ida operatsiyalar topilmadi.</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
-    {% else %}
-    <div class="empty-state">
-        <div class="icon">📋</div>
-        <h3>Operatsiyalar topilmadi</h3>
-        <p>Filter o'zgartiring yoki yangi operatsiya qo'shing</p>
-        <br>
-        <a href="{% url 'transaction_add' %}" class="btn btn-primary">+ Yangi operatsiya</a>
-    </div>
-    {% endif %}
 </div>
 {% endblock %}
