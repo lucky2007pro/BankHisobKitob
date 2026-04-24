@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}Profil - FinTracker Pro{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="glass-card">
+            <h2 class="mb-4"><i class="fa-solid fa-user-gear text-info"></i> Profilni tahrirlash</h2>
+            
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                {% for field in form %}
+                    <div class="mb-3">
+                        <label class="form-label text-muted small">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.errors %}
+                            <span class="text-danger small">{{ field.errors.0 }}</span>
+                        {% endif %}
+                        {% if field.help_text %}
+                            <div class="form-text text-muted smaller">{{ field.help_text }}</div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+                
+                <div class="d-flex gap-2 mt-4">
+                    <button type="submit" class="btn btn-neon flex-grow-1">Saqlash</button>
+                    <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">Bekor qilish</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-control {
+        background: rgba(0, 0, 0, 0.2) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        color: #fff !important;
+        padding: 10px 15px;
+    }
+    .form-control:focus {
+        border-color: #00f2fe !important;
+        box-shadow: 0 0 8px rgba(0, 242, 254, 0.5) !important;
+    }
+    .smaller {
+        font-size: 0.75rem;
+    }
+</style>
+{% endblock %}

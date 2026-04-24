@@ -8,10 +8,10 @@ from .models import User
 class SignUpView(CreateView):
     form_class = CustomUserCreationForm
     success_url = reverse_lazy('login')
-    template_name = 'users/signup.html'
+    template_name = 'signup.html'
 
 class UserLoginView(LoginView):
-    template_name = 'users/login.html'
+    template_name = 'login.html'
     next_page = reverse_lazy('dashboard')
 
 class UserLogoutView(LogoutView):
@@ -20,7 +20,7 @@ class UserLogoutView(LogoutView):
 class ProfileUpdateView(LoginRequiredMixin, UpdateView):
     model = User
     form_class = CustomUserProfileForm
-    template_name = 'users/profile.html'
+    template_name = 'profile.html'
     success_url = reverse_lazy('profile')
 
     def get_object(self):

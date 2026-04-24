@@ -10,7 +10,7 @@ from .models import Transaction, TransactionType
 
 
 class DashboardView(LoginRequiredMixin, TemplateView):
-    template_name = 'finance/dashboard.html'
+    template_name = 'dashboard.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -54,7 +54,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
 
 class TransactionReportView(LoginRequiredMixin, ListView):
     model = Transaction
-    template_name = 'finance/report_list.html'
+    template_name = 'report_list.html'
     context_object_name = 'transactions'
 
     def get_queryset(self):
@@ -77,7 +77,7 @@ class TransactionReportView(LoginRequiredMixin, ListView):
 class TransactionCreateView(LoginRequiredMixin, CreateView):
     model = Transaction
     form_class = TransactionForm
-    template_name = 'finance/transaction_create.html'
+    template_name = 'finance/transaction_form.html'
     success_url = reverse_lazy('dashboard')
 
     def get_form_kwargs(self):
