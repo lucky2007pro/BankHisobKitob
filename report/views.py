@@ -6,7 +6,7 @@ from django.utils import timezone
 from datetime import timedelta
 
 from .forms import TransactionForm, AccountForm
-from .models import Transaction, TransactionType, Account
+from .models import Transaction, TransactionType, Account, Category
 
 
 class DashboardView(LoginRequiredMixin, TemplateView):
@@ -148,6 +148,12 @@ class TransactionCreateView(LoginRequiredMixin, CreateView):
         kwargs = super().get_form_kwargs()
         kwargs['user'] = self.request.user
         return kwargs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Add categories data for dynamic filtering in JavaScript
+        context['categories_data'] = list(Category.objects.values('id', 'name', 'type'))
+        return context
 
     def form_valid(self, form):
         form.instance.user = self.request.user

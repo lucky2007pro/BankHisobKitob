@@ -5,7 +5,7 @@ from .models import Transaction, Category, Account
 class TransactionForm(forms.ModelForm):
     class Meta:
         model = Transaction
-        fields = ['account', 'category', 'transaction_type', 'amount', 'date', 'comment', 'receipt_image']
+        fields = ['account', 'transaction_type', 'category', 'amount', 'date', 'comment', 'receipt_image']
 
         widgets = {
             'date': forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),

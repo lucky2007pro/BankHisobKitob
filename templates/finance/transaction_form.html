@@ -45,15 +45,53 @@
 {% endblock %}
 
 {% block extra_js %}
+{{ categories_data|json_script:"categories-data" }}
 <script>
-    // Autofill date if empty
     document.addEventListener("DOMContentLoaded", function() {
+        // Autofill date if empty
         const dateInput = document.querySelector('input[type="datetime-local"]');
         if (dateInput && !dateInput.value) {
             const now = new Date();
             now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
             dateInput.value = now.toISOString().slice(0, 16);
         }
+
+        // Dynamic category filtering
+        const typeSelect = document.querySelector('[name="transaction_type"]');
+        const categorySelect = document.querySelector('[name="category"]');
+        const dataElem = document.getElementById('categories-data');
+        
+        if (!typeSelect || !categorySelect || !dataElem) {
+            console.error("Required elements not found for category filtering");
+            return;
+        }
+
+        const categoriesData = JSON.parse(dataElem.textContent);
+
+        function filterCategories() {
+            const selectedType = typeSelect.value;
+            const currentCategoryId = categorySelect.value;
+            
+            // Clear current options
+            categorySelect.innerHTML = '<option value="">---------</option>';
+            
+            // Add filtered options
+            categoriesData.forEach(function(cat) {
+                if (!selectedType || cat.type === selectedType) {
+                    const option = document.createElement('option');
+                    option.value = cat.id;
+                    option.textContent = cat.name;
+                    if (cat.id.toString() === currentCategoryId) {
+                        option.selected = true;
+                    }
+                    categorySelect.appendChild(option);
+                }
+            });
+        }
+
+        typeSelect.addEventListener('change', filterCategories);
+        // Run once on load to handle initial value
+        filterCategories();
     });
 </script>
 {% endblock %}
