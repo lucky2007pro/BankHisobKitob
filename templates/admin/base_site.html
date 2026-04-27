@@ -1,0 +1,83 @@
+{% extends 'admin/base.html' %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+    /* Premium Dark Admin Theme */
+    :root {
+        --primary: #00f2fe;
+        --secondary: #4facfe;
+        --dark-bg: #0f172a;
+        --card-bg: rgba(255, 255, 255, 0.05);
+        --text-light: #f8fafc;
+    }
+
+    body {
+        background: var(--dark-bg) !important;
+        color: var(--text-light) !important;
+    }
+
+    #header {
+        background: var(--dark-bg);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+    }
+
+    .module h2, .module caption, .inline-group h2 {
+        background: var(--secondary) !important;
+        color: white !important;
+    }
+
+    div.breadcrumbs {
+        background: rgba(0, 0, 0, 0.2);
+        color: #94a3b8;
+    }
+
+    #content-main {
+        background: transparent;
+    }
+
+    .module {
+        background: var(--card-bg) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border-radius: 8px !important;
+        overflow: hidden;
+    }
+
+    table thead th {
+        background: rgba(0, 0, 0, 0.3) !important;
+        color: var(--primary) !important;
+    }
+
+    tr.row1, tr.row2 {
+        background: transparent !important;
+        color: var(--text-light) !important;
+    }
+
+    tr:hover {
+        background: rgba(255, 255, 255, 0.05) !important;
+    }
+
+    .button, input[type=submit], input[type=button], .submit-row input, a.button {
+        background: linear-gradient(45deg, var(--secondary), var(--primary)) !important;
+        border: none !important;
+        border-radius: 5px !important;
+        color: white !important;
+        font-weight: bold !important;
+    }
+
+    input, select, textarea {
+        background: rgba(0, 0, 0, 0.2) !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        color: white !important;
+    }
+
+    a:link, a:visited {
+        color: var(--primary) !important;
+    }
+</style>
+{% endblock %}
+
+{% block branding %}
+<h1 id="site-name"><a href="{% url 'admin:index' %}">FinTracker Pro Admin</a></h1>
+{% endblock %}

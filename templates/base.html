@@ -3,154 +3,239 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Moliya Tizimi{% endblock %}</title>
+    <title>{% block title %}FinTracker Pro{% endblock %}</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --bg-color: #0f172a; /* To'q ko'k/qora high-tech fon */
-            --glass-bg: rgba(255, 255, 255, 0.05);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --neon-blue: #00f2fe;
-            --neon-green: #4facfe;
+            --bg-color: #0b1120;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --neon-blue: #38bdf8;
+            --neon-indigo: #6366f1;
+            --neon-green: #10b981;
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
+            --card-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
         }
 
         body {
             background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.05) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(99, 102, 241, 0.05) 0px, transparent 50%);
             color: var(--text-main);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', sans-serif;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            overflow-x: hidden;
         }
 
         /* Navbar & Glassmorphism */
         .glass-navbar {
-            background: var(--glass-bg);
-            backdrop-filter: blur(10px);
+            background: rgba(11, 17, 32, 0.8);
+            backdrop-filter: blur(12px);
             border-bottom: 1px solid var(--glass-border);
+            padding: 1rem 0;
         }
 
-        .navbar-brand, .nav-link {
-            color: var(--text-main) !important;
+        .navbar-brand {
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            background: linear-gradient(to right, var(--neon-blue), var(--neon-indigo));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-link {
+            color: var(--text-muted) !important;
             font-weight: 500;
+            transition: all 0.2s ease;
+            margin: 0 0.5rem;
         }
 
-        .nav-link:hover {
-            color: var(--neon-blue) !important;
-            text-shadow: 0 0 8px var(--neon-blue);
+        .nav-link:hover, .nav-link.active {
+            color: var(--text-main) !important;
         }
 
         /* Asosiy kontent */
         .main-container {
             flex: 1;
-            padding: 2rem 0;
+            padding: 3rem 0;
         }
 
         /* Glass Card */
         .glass-card {
             background: var(--glass-bg);
-            backdrop-filter: blur(15px);
+            backdrop-filter: blur(16px);
             border: 1px solid var(--glass-border);
-            border-radius: 15px;
-            padding: 1.5rem;
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: var(--card-shadow);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .glass-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--neon-blue);
+            border-color: rgba(56, 189, 248, 0.3);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.45);
+        }
+
+        /* Status Cards */
+        .stat-card {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--accent-color, var(--neon-blue));
         }
 
         /* Neon Buttons */
         .btn-neon {
-            background: linear-gradient(45deg, var(--neon-green), var(--neon-blue));
+            background: linear-gradient(135deg, var(--neon-blue), var(--neon-indigo));
             border: none;
             color: #fff;
-            padding: 10px 25px;
-            border-radius: 8px;
+            padding: 12px 28px;
+            border-radius: 12px;
             font-weight: 600;
-            transition: 0.3s;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(56, 189, 248, 0.2);
         }
 
         .btn-neon:hover {
-            box-shadow: 0 0 15px var(--neon-blue);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(56, 189, 248, 0.4);
             color: #fff;
+        }
+
+        .btn-outline-neon {
+            background: transparent;
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+            padding: 10px 24px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline-neon:hover {
+            background: var(--glass-border);
+            color: var(--neon-blue);
+            border-color: var(--neon-blue);
         }
 
         /* Formalar */
         .form-control, .form-select {
-            background: rgba(0, 0, 0, 0.2);
-            border: 1px solid var(--glass-border);
-            color: #fff;
+            background: rgba(15, 23, 42, 0.6) !important;
+            border: 1px solid var(--glass-border) !important;
+            color: #fff !important;
+            border-radius: 12px;
+            padding: 12px 16px;
         }
 
         .form-control:focus, .form-select:focus {
-            background: rgba(0, 0, 0, 0.3);
-            border-color: var(--neon-blue);
-            box-shadow: 0 0 8px rgba(0, 242, 254, 0.5);
-            color: #fff;
+            background: rgba(15, 23, 42, 0.8) !important;
+            border-color: var(--neon-blue) !important;
+            box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.1) !important;
         }
 
         /* Jadvallar */
         .table {
-            color: var(--text-main);
-            vertical-align: middle;
+            color: var(--text-main) !important;
+            margin-bottom: 0;
         }
-        .table tbody tr {
+
+        .table thead th {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
             border-bottom: 1px solid var(--glass-border);
+            padding: 1.25rem 1rem;
         }
-        .table tbody tr:hover {
-            background-color: rgba(255,255,255,0.05);
+
+        .table tbody td {
+            padding: 1.25rem 1rem;
+            border-bottom: 1px solid var(--glass-border);
+            background: transparent !important;
+        }
+
+        .table tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease forwards;
         }
     </style>
+    {% block extra_head %}{% endblock %}
 </head>
 <body>
 
     <nav class="navbar navbar-expand-lg glass-navbar sticky-top">
         <div class="container">
-            <a class="navbar-brand" href="{% url 'dashboard' %}">
-                <i class="fa-solid fa-wallet text-info"></i> FinTracker Pro
+            <a class="navbar-brand d-flex align-items-center" href="{% url 'dashboard' %}">
+                <i class="fa-solid fa-wallet me-2 fs-4"></i> FinTracker Pro
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     {% if user.is_authenticated %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'dashboard' %}"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
+                            <a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'transaction_list' %}"><i class="fa-solid fa-list"></i> Hisobotlar</a>
+                            <a class="nav-link" href="{% url 'transaction_list' %}">Hisobotlar</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'transaction_add' %}"><i class="fa-solid fa-plus"></i> Yangi operatsiya</a>
+                            <a class="nav-link" href="{% url 'account_add' %}">Hisob qo'shish</a>
                         </li>
                     {% endif %}
                 </ul>
-                <ul class="navbar-nav">
+                <ul class="navbar-nav align-items-center">
                     {% if user.is_authenticated %}
-                        <li class="nav-item me-3">
-                            <span class="nav-link text-light">Salom, {{ user.username }}!</span>
-                        </li>
-                        <li class="nav-item">
-                            <form method="post" action="{% url 'logout' %}" class="d-inline">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-outline-danger btn-sm mt-1"><i class="fa-solid fa-right-from-bracket"></i> Chiqish</button>
-                            </form>
+                        <li class="nav-item dropdown me-2">
+                            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
+                                <div class="avatar-sm me-2 bg-primary rounded-circle d-flex align-items-center justify-content-center text-white" style="width: 32px; height: 32px; font-size: 0.8rem;">
+                                    {{ user.username|first|upper }}
+                                </div>
+                                <span>{{ user.username }}</span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end glass-card p-2" style="min-width: 200px; background: rgba(15, 23, 42, 0.95);">
+                                <li><a class="dropdown-item rounded-2 py-2 text-white" href="{% url 'profile' %}"><i class="fa-solid fa-user me-2 opacity-50"></i> Profilim</a></li>
+                                <li><hr class="dropdown-divider opacity-10"></li>
+                                <li>
+                                    <form method="post" action="{% url 'logout' %}">
+                                        {% csrf_token %}
+                                        <button type="submit" class="dropdown-item rounded-2 py-2 text-danger"><i class="fa-solid fa-right-from-bracket me-2 opacity-50"></i> Chiqish</button>
+                                    </form>
+                                </li>
+                            </ul>
                         </li>
                     {% else %}
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'login' %}">Kirish</a>
                         </li>
                         <li class="nav-item">
-                            <a class="btn btn-neon btn-sm ms-2 mt-1" href="{% url 'signup' %}">Ro'yxatdan o'tish</a>
+                            <a class="btn-neon btn-sm ms-2" href="{% url 'signup' %}">Ro'yxatdan o'tish</a>
                         </li>
                     {% endif %}
                 </ul>
@@ -164,5 +249,12 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        .dropdown-item:hover {
+            background: rgba(255, 255, 255, 0.05) !important;
+            color: var(--neon-blue) !important;
+        }
+    </style>
+    {% block extra_js %}{% endblock %}
 </body>
 </html>

@@ -1,20 +1,20 @@
 {% extends 'base.html' %}
 
-{% block title %}Operatsiya | FinTracker Pro{% endblock %}
+{% block title %}Hisob qo'shish | FinTracker Pro{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center animate-fade-in">
     <div class="col-md-6">
         <div class="glass-card">
             <div class="text-center mb-4">
-                <div class="p-3 bg-info bg-opacity-10 rounded-circle d-inline-block mb-3">
-                    <i class="fa-solid fa-plus-circle text-info fs-3"></i>
+                <div class="p-3 bg-primary bg-opacity-10 rounded-circle d-inline-block mb-3">
+                    <i class="fa-solid fa-credit-card text-primary fs-3"></i>
                 </div>
-                <h3 class="fw-bold">Yangi Operatsiya</h3>
-                <p class="text-muted">Kirish yoki chiqim operatsiyasini yozib qoldiring</p>
+                <h3 class="fw-bold">Yangi Hisob qo'shish</h3>
+                <p class="text-muted">Karta yoki naqd pul hamyoningizni kiriting</p>
             </div>
 
-            <form method="post" enctype="multipart/form-data">
+            <form method="post">
                 {% csrf_token %}
 
                 {% for field in form %}
@@ -32,7 +32,7 @@
 
                 <div class="d-grid gap-3 mt-5">
                     <button type="submit" class="btn-neon">
-                        <i class="fa-solid fa-check me-2"></i> Operatsiyani saqlash
+                        <i class="fa-solid fa-plus me-2"></i> Hisobni saqlash
                     </button>
                     <a href="{% url 'dashboard' %}" class="btn btn-outline-neon">
                         Bekor qilish
@@ -42,18 +42,4 @@
         </div>
     </div>
 </div>
-{% endblock %}
-
-{% block extra_js %}
-<script>
-    // Autofill date if empty
-    document.addEventListener("DOMContentLoaded", function() {
-        const dateInput = document.querySelector('input[type="datetime-local"]');
-        if (dateInput && !dateInput.value) {
-            const now = new Date();
-            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-            dateInput.value = now.toISOString().slice(0, 16);
-        }
-    });
-</script>
 {% endblock %}

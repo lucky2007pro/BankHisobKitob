@@ -11,7 +11,7 @@ class CustomUserCreationForm(UserCreationForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field in self.fields.values():
-            field.widget.attrs.update({'class': 'form-input-modern'})
+            field.widget.attrs.update({'class': 'form-control'})
 
 
 class CustomUserProfileForm(forms.ModelForm):
@@ -20,6 +20,9 @@ class CustomUserProfileForm(forms.ModelForm):
         fields = ('first_name', 'last_name', 'email', 'phone_number', 'avatar')
 
         widgets = {
-            'first_name': forms.TextInput(attrs={'placeholder': 'Ismingiz'}),
-            'avatar': forms.FileInput(attrs={'class': 'custom-file-upload'}),
+            'first_name': forms.TextInput(attrs={'placeholder': 'Ismingiz', 'class': 'form-control'}),
+            'last_name': forms.TextInput(attrs={'placeholder': 'Familiyangiz', 'class': 'form-control'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control'}),
+            'phone_number': forms.TextInput(attrs={'class': 'form-control'}),
+            'avatar': forms.FileInput(attrs={'class': 'form-control'}),
         }

@@ -1,64 +1,41 @@
-<section class="auth-section">
-    <div class="glass-card">
-        <h2>Ro'yxatdan o'tish</h2>
+{% extends 'base.html' %}
+
+{% block title %}Ro'yxatdan o'tish | FinTracker Pro{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+    <div class="glass-card w-100 animate-fade-in" style="max-width: 500px;">
+        <div class="text-center mb-4">
+            <div class="p-3 bg-primary bg-opacity-10 rounded-circle d-inline-block mb-3">
+                <i class="fa-solid fa-user-plus text-primary fs-3"></i>
+            </div>
+            <h3 class="fw-bold">Yangi hisob yaratish</h3>
+            <p class="text-muted">FinTracker Pro oilasiga qo'shiling</p>
+        </div>
 
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
-
-            {% for field in form %}
-                <div class="input-group">
-                    <label>{{ field.label }}</label>
+            
+            <div class="row">
+                {% for field in form %}
+                <div class="{% if field.name == 'username' or field.name == 'email' %}col-12{% else %}col-12{% endif %} mb-3">
+                    <label class="form-label text-muted small fw-medium">{{ field.label }}</label>
                     {{ field }}
                     {% if field.errors %}
-                        <span class="error-text">{{ field.errors.0 }}</span>
+                        <div class="text-danger small mt-1">{{ field.errors.0 }}</div>
                     {% endif %}
                 </div>
-            {% endfor %}
+                {% endfor %}
+            </div>
 
-            <button type="submit" class="btn-neon">Hisob yaratish</button>
+            <button type="submit" class="btn-neon w-100 mt-3 mb-3">
+                Ro'yxatdan o'tish <i class="fa-solid fa-check ms-2"></i>
+            </button>
         </form>
 
-        <p>Accountingiz bormi? <a href="{% url 'login' %}">Kirish</a></p>
+        <div class="text-center mt-4 pt-3 border-top border-white border-opacity-10">
+            <p class="text-muted small mb-0">Accountingiz bormi? <a href="{% url 'login' %}" class="text-info text-decoration-none fw-medium">Kirish</a></p>
+        </div>
     </div>
-</section>
-
-<style>
-/* Modern Glassmorphism Dizayn */
-.glass-card {
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(15px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 2rem;
-    border-radius: 20px;
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-    color: white;
-}
-
-.form-input-modern {
-    width: 100%;
-    background: rgba(0, 0, 0, 0.2);
-    border: 1px solid #4facfe; /* Neon rang */
-    padding: 10px;
-    border-radius: 8px;
-    color: white;
-    outline: none;
-    transition: 0.3s;
-}
-
-.form-input-modern:focus {
-    box-shadow: 0 0 10px #00f2fe;
-}
-
-.btn-neon {
-    width: 100%;
-    padding: 12px;
-    margin-top: 15px;
-    border: none;
-    border-radius: 8px;
-    background: linear-gradient(45deg, #00f2fe 0%, #4facfe 100%);
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
-    text-transform: uppercase;
-}
-</style>
+</div>
+{% endblock %}

@@ -28,12 +28,6 @@ class Account(models.Model):
 
 
 class Category(models.Model):
-    """ Kirim va chiqim kategoriyalari """
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name='categories'
-    )
     name = models.CharField(max_length=100, help_text="Masalan: Transport, Oziq-ovqat, Maosh")
     type = models.CharField(
         max_length=10,
@@ -45,15 +39,13 @@ class Category(models.Model):
         db_table = 'categories'
         verbose_name = 'Kategoriya'
         verbose_name_plural = 'Kategoriyalar'
-        # Bir userda bir xil nomli ikkita bir xil turdagi kategoriya bo'lmasligi uchun:
-        unique_together = ['user', 'name', 'type']
+        unique_together = ['name', 'type']
 
     def __str__(self):
         return f"{self.name} ({self.get_type_display()})"
 
 
 class Transaction(models.Model):
-    """ Asosiy kirim va chiqim operatsiyalari """
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -77,7 +69,6 @@ class Transaction(models.Model):
     amount = models.DecimalField(max_digits=15, decimal_places=2)
     date = models.DateTimeField(help_text="Operatsiya qilingan sana va vaqt")
 
-    # Qo'shimcha ma'lumotlar
     comment = models.TextField(blank=True, null=True, help_text="Izoh qoldirish uchun")
     receipt_image = models.ImageField(upload_to='receipts/%Y/%m/', blank=True, null=True)
 
@@ -88,7 +79,7 @@ class Transaction(models.Model):
         db_table = 'transactions'
         verbose_name = 'Tranzaksiya'
         verbose_name_plural = 'Tranzaksiyalar'
-        ordering = ['-date']  # Eng yangilari birinchi chiqishi uchun
+        ordering = ['-date']
 
     def __str__(self):
         return f"{self.get_transaction_type_display()} | {self.amount} | {self.date.strftime('%Y-%m-%d')}"

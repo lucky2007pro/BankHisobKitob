@@ -1,80 +1,191 @@
 {% extends 'base.html' %}
 
-{% block title %}Dashboard | FinTracker{% endblock %}
+{% block title %}Dashboard | FinTracker Pro{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
 
 {% block content %}
-<div class="row mb-4">
+<div class="row mb-5 animate-fade-in">
     <div class="col-12">
-        <h2 class="fw-bold mb-3"><i class="fa-solid fa-chart-pie text-info"></i> Moliya Paneli</h2>
-    </div>
-</div>
-
-<div class="row g-4 mb-5">
-    <div class="col-md-3">
-        <div class="glass-card text-center" style="border-bottom: 3px solid #00f2fe;">
-            <p class="text-muted mb-1">Jami Qoldiq</p>
-            <h3 class="fw-bold">{{ net_balance|floatformat:2 }} <span class="fs-6">UZS</span></h3>
-        </div>
-    </div>
-
-    <div class="col-md-3">
-        <div class="glass-card text-center">
-            <p class="text-muted mb-1">Bugun</p>
-            <div class="d-flex justify-content-between px-2">
-                <span class="text-success"><i class="fa-solid fa-arrow-up"></i> {{ daily_inc|floatformat:0 }}</span>
-                <span class="text-danger"><i class="fa-solid fa-arrow-down"></i> {{ daily_exp|floatformat:0 }}</span>
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h2 class="fw-bold mb-1">Xush kelibsiz, {{ user.first_name|default:user.username }}!</h2>
+                <p class="text-muted mb-0">Statistikani saralash:</p>
             </div>
-        </div>
-    </div>
-
-    <div class="col-md-3">
-        <div class="glass-card text-center">
-            <p class="text-muted mb-1">Shu oy</p>
-            <div class="d-flex justify-content-between px-2">
-                <span class="text-success"><i class="fa-solid fa-arrow-up"></i> {{ monthly_inc|floatformat:0 }}</span>
-                <span class="text-danger"><i class="fa-solid fa-arrow-down"></i> {{ monthly_exp|floatformat:0 }}</span>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-3">
-        <div class="glass-card text-center">
-            <p class="text-muted mb-1">Jami Yillik</p>
-            <div class="d-flex justify-content-between px-2">
-                <span class="text-success"><i class="fa-solid fa-arrow-up"></i> {{ yearly_inc|floatformat:0 }}</span>
-                <span class="text-danger"><i class="fa-solid fa-arrow-down"></i> {{ yearly_exp|floatformat:0 }}</span>
+            <div class="d-flex gap-2">
+                <form method="get" class="d-flex gap-2 align-items-center bg-white bg-opacity-5 p-2 rounded-3 border border-white border-opacity-10">
+                    <input type="date" name="start_date" class="form-control form-control-sm bg-transparent border-0 text-white" value="{{ request.GET.start_date }}" style="width: 130px;">
+                    <span class="text-muted">-</span>
+                    <input type="date" name="end_date" class="form-control form-control-sm bg-transparent border-0 text-white" value="{{ request.GET.end_date }}" style="width: 130px;">
+                    <button type="submit" class="btn btn-sm btn-info px-2 py-1"><i class="fa-solid fa-sync"></i></button>
+                    {% if request.GET.start_date or request.GET.end_date %}
+                        <a href="{% url 'dashboard' %}" class="btn btn-sm btn-outline-danger px-2 py-1"><i class="fa-solid fa-times"></i></a>
+                    {% endif %}
+                </form>
+                <a href="{% url 'transaction_add' %}" class="btn-neon">
+                    <i class="fa-solid fa-plus me-2"></i> Yangi operatsiya
+                </a>
             </div>
         </div>
     </div>
 </div>
 
-<div class="row">
-    <div class="col-md-12">
-        <div class="glass-card">
-            <h4 class="mb-4"><i class="fa-solid fa-wallet text-info"></i> Mening hisoblarim</h4>
-            <div class="table-responsive">
-                <table class="table table-borderless text-light">
-                    <thead>
-                        <tr class="text-muted" style="border-bottom: 1px solid rgba(255,255,255,0.1);">
-                            <th>Nomi</th>
-                            <th class="text-end">Balans</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for account in accounts %}
-                        <tr>
-                            <td><i class="fa-brands fa-cc-visa text-muted me-2"></i> {{ account.name }}</td>
-                            <td class="text-end fw-bold">{{ account.balance|floatformat:2 }} UZS</td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="2" class="text-center text-muted">Hali hisob qo'shilmagan</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+<div class="row g-4 mb-5 animate-fade-in" style="animation-delay: 0.1s;">
+    <div class="col-md-3">
+        <div class="glass-card h-100 stat-card" style="--accent-color: var(--neon-blue);">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <div class="p-2 bg-info bg-opacity-10 rounded-3">
+                    <i class="fa-solid fa-wallet text-info"></i>
+                </div>
+                <span class="text-info small fw-medium">Jami qoldiq</span>
+            </div>
+            <h3 class="fw-bold mb-1">{{ net_balance|floatformat:2 }} <span class="fs-6 fw-normal text-muted">UZS</span></h3>
+            <p class="text-muted small mb-0">Barcha hamyonlar bo'yicha</p>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="glass-card h-100 stat-card" style="--accent-color: var(--neon-green);">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <div class="p-2 bg-success bg-opacity-10 rounded-3">
+                    <i class="fa-solid fa-arrow-up text-success"></i>
+                </div>
+                <span class="text-success small fw-medium">Bugun tushum</span>
+            </div>
+            <h3 class="fw-bold mb-1 text-success">+{{ daily_inc|floatformat:0 }}</h3>
+            <p class="text-muted small mb-0">Daromadi operatsiyalari</p>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="glass-card h-100 stat-card" style="--accent-color: #ef4444;">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <div class="p-2 bg-danger bg-opacity-10 rounded-3">
+                    <i class="fa-solid fa-arrow-down text-danger"></i>
+                </div>
+                <span class="text-danger small fw-medium">Bugun chiqim</span>
+            </div>
+            <h3 class="fw-bold mb-1 text-danger">-{{ daily_exp|floatformat:0 }}</h3>
+            <p class="text-muted small mb-0">Xarajatlar</p>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="glass-card h-100 stat-card" style="--accent-color: var(--neon-indigo);">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <div class="p-2 bg-primary bg-opacity-10 rounded-3">
+                    <i class="fa-solid fa-calendar text-primary"></i>
+                </div>
+                <span class="text-primary small fw-medium">Shu oy</span>
+            </div>
+            <div class="d-flex align-items-end justify-content-between">
+                <div>
+                    <div class="text-success small"><i class="fa-solid fa-caret-up"></i> {{ monthly_inc|floatformat:0 }}</div>
+                    <div class="text-danger small"><i class="fa-solid fa-caret-down"></i> {{ monthly_exp|floatformat:0 }}</div>
+                </div>
+                <i class="fa-solid fa-chart-line text-muted"></i>
             </div>
         </div>
     </div>
 </div>
+
+<div class="row g-4 animate-fade-in" style="animation-delay: 0.2s;">
+    <div class="col-lg-8">
+        <div class="glass-card h-100">
+            <h4 class="mb-4 d-flex align-items-center">
+                <i class="fa-solid fa-chart-line text-info me-2"></i> Moliyaviy tendensiya
+            </h4>
+            <div style="height: 300px;">
+                <canvas id="financeChart"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="glass-card h-100">
+            <h4 class="mb-4 d-flex align-items-center justify-content-between">
+                <span><i class="fa-solid fa-credit-card text-info me-2"></i> Mening hisoblarim</span>
+                <a href="{% url 'account_add' %}" class="btn btn-sm btn-outline-neon py-1 px-2" style="font-size: 0.7rem;">
+                    <i class="fa-solid fa-plus"></i>
+                </a>
+            </h4>
+            <div class="list-group list-group-flush bg-transparent">
+                {% for account in accounts %}
+                <div class="list-group-item bg-transparent px-0 border-opacity-10 border-white d-flex justify-content-between align-items-center py-3">
+                    <div class="d-flex align-items-center">
+                        <div class="p-2 bg-secondary bg-opacity-20 rounded-circle me-3">
+                            <i class="fa-solid fa-building-columns text-light"></i>
+                        </div>
+                        <div>
+                            <div class="fw-medium">{{ account.name }}</div>
+                            <div class="text-muted small">Asosiy hamyon</div>
+                        </div>
+                    </div>
+                        <div>
+                            <div class="fw-bold">{{ account.balance|floatformat:2 }}</div>
+                            <div class="text-muted small">
+                                UZS 
+                                <a href="{% url 'transaction_add' %}?account={{ account.id }}&type=INCOME" class="ms-2 text-success text-decoration-none" title="Pul kiritish">
+                                    <i class="fa-solid fa-circle-plus"></i>
+                                </a>
+                            </div>
+                        </div>
+                </div>
+                {% empty %}
+                <div class="text-center py-4">
+                    <i class="fa-solid fa-plus-circle text-muted fs-1 mb-3"></i>
+                    <p class="text-muted">Hisoblar mavjud emas</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const ctx = document.getElementById('financeChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: {{ chart_labels|safe }},
+            datasets: [{
+                label: 'Daromad',
+                data: {{ chart_income|safe }},
+                borderColor: '#10b981',
+                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                fill: true,
+                tension: 0.4
+            }, {
+                label: 'Xarajat',
+                data: {{ chart_expense|safe }},
+                borderColor: '#ef4444',
+                backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    labels: { color: '#94a3b8', font: { family: 'Inter' } }
+                }
+            },
+            scales: {
+                y: {
+                    grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                    ticks: { color: '#94a3b8' }
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: { color: '#94a3b8' }
+                }
+            }
+        }
+    });
+</script>
 {% endblock %}
