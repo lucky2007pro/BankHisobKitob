@@ -4,18 +4,8 @@ from django.contrib.auth.models import AbstractUser
 
 class User(AbstractUser):
 
-    phone_number = models.CharField(
-        max_length=15,
-        blank=True,
-        null=True,
-        verbose_name="Telefon raqami"
-    )
-    avatar = models.ImageField(
-        upload_to='avatars/%Y/%m/',
-        blank=True,
-        null=True,
-        verbose_name="Profil rasmi"
-    )
+    phone_number = models.CharField(max_length=15, blank=True, null=True, verbose_name="Telefon raqami")
+    avatar = models.ImageField(upload_to='avatars/%Y/%m/', blank=True, null=True, verbose_name="Profil rasmi")
 
     class Meta:
         db_table = 'users'
