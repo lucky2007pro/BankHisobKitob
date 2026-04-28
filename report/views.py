@@ -1,12 +1,30 @@
 from django.urls import reverse_lazy
-from django.views.generic import ListView, TemplateView, CreateView
+from django.views.generic import ListView, TemplateView, CreateView, FormView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db import transaction as db_transaction
 from django.db.models import Sum
 from django.utils import timezone
 from datetime import timedelta
+from decimal import Decimal, ROUND_HALF_UP
 
-from .forms import TransactionForm, AccountForm
-from .models import Transaction, TransactionType, Account, Category
+from .forms import TransactionForm, AccountForm, TransferForm
+from .models import Transaction, TransactionType, Account, Category, CurrencyType
+
+
+CURRENCY_TO_UZS = {
+    CurrencyType.UZS: Decimal('1'),
+    CurrencyType.USD: Decimal('12800'),
+    CurrencyType.RUB: Decimal('140'),
+}
+
+
+def convert_currency(amount, from_currency, to_currency):
+    if from_currency == to_currency:
+        return amount
+
+    amount_in_uzs = Decimal(amount) * CURRENCY_TO_UZS[from_currency]
+    converted = amount_in_uzs / CURRENCY_TO_UZS[to_currency]
+    return converted.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
 
 
 class DashboardView(LoginRequiredMixin, TemplateView):
@@ -67,6 +85,24 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         context['yearly_inc'], context['yearly_exp'] = get_stats(year_start)
 
         context['accounts'] = user.accounts.all()
+        account_totals = {
+            CurrencyType.UZS: Decimal('0.00'),
+            CurrencyType.USD: Decimal('0.00'),
+            CurrencyType.RUB: Decimal('0.00'),
+        }
+        for account in context['accounts']:
+            account_totals[account.currency] += account.balance
+
+        total_balance_uzs = Decimal('0.00')
+        for currency_code, balance in account_totals.items():
+            total_balance_uzs += convert_currency(balance, currency_code, CurrencyType.UZS)
+
+        context['balance_by_currency'] = [
+            {'currency': CurrencyType.UZS, 'amount': account_totals[CurrencyType.UZS]},
+            {'currency': CurrencyType.USD, 'amount': account_totals[CurrencyType.USD]},
+            {'currency': CurrencyType.RUB, 'amount': account_totals[CurrencyType.RUB]},
+        ]
+        context['total_balance_uzs'] = total_balance_uzs
 
         chart_labels = []
         chart_income = []
@@ -140,6 +176,11 @@ class TransactionCreateView(LoginRequiredMixin, CreateView):
         t_type = self.request.GET.get('type')
         if account_id:
             initial['account'] = account_id
+            try:
+                account = Account.objects.get(pk=account_id, user=self.request.user)
+                initial['currency'] = account.currency
+            except Account.DoesNotExist:
+                initial['currency'] = CurrencyType.UZS
         if t_type:
             initial['transaction_type'] = t_type
         return initial
@@ -156,17 +197,25 @@ class TransactionCreateView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.user = self.request.user
-
         transaction = form.save(commit=False)
-        account = transaction.account
 
-        if transaction.transaction_type == TransactionType.INCOME:
-            account.balance += transaction.amount
-        else:
-            account.balance -= transaction.amount
+        with db_transaction.atomic():
+            account = Account.objects.select_for_update().get(pk=transaction.account_id, user=self.request.user)
 
-        account.save()
-        return super().form_valid(form)
+            if transaction.currency != account.currency:
+                form.add_error('currency', 'Tranzaksiya valyutasi hisob valyutasi bilan bir xil bo‘lishi kerak')
+                return self.form_invalid(form)
+
+            if transaction.transaction_type == TransactionType.EXPENSE:
+                if transaction.amount > account.balance:
+                    form.add_error('amount', "Hisobda mablag' yetarli emas!")
+                    return self.form_invalid(form)
+                account.balance -= transaction.amount
+            else:
+                account.balance += transaction.amount
+
+            account.save()
+            return super().form_valid(form)
 
 
 class AccountCreateView(LoginRequiredMixin, CreateView):
@@ -178,4 +227,93 @@ class AccountCreateView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.user = self.request.user
+        return super().form_valid(form)
+
+
+class TransferCreateView(LoginRequiredMixin, FormView):
+    form_class = TransferForm
+    template_name = 'finance/transfer_form.html'
+    login_url = '/users/login/'
+    success_url = reverse_lazy('dashboard')
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
+    def get_initial(self):
+        initial = super().get_initial()
+        initial['date'] = timezone.now().strftime('%Y-%m-%dT%H:%M')
+        return initial
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['transfer_rates'] = [
+            ('1 USD', f"{CURRENCY_TO_UZS[CurrencyType.USD]:,.0f} UZS"),
+            ('1 RUB', f"{CURRENCY_TO_UZS[CurrencyType.RUB]:,.2f} UZS"),
+        ]
+        return context
+
+    def form_valid(self, form):
+        from_account = form.cleaned_data['from_account']
+        to_account = form.cleaned_data['to_account']
+        amount = form.cleaned_data['amount']
+        date = form.cleaned_data['date']
+        comment = (form.cleaned_data.get('comment') or '').strip()
+
+        with db_transaction.atomic():
+            account_ids = sorted([from_account.pk, to_account.pk])
+            locked_accounts = Account.objects.select_for_update().filter(pk__in=account_ids, user=self.request.user)
+            accounts_map = {acc.pk: acc for acc in locked_accounts}
+            from_locked = accounts_map.get(from_account.pk)
+            to_locked = accounts_map.get(to_account.pk)
+
+            if not from_locked or not to_locked:
+                form.add_error(None, 'Hisoblar topilmadi')
+                return self.form_invalid(form)
+
+            if amount > from_locked.balance:
+                form.add_error('amount', "Tanlangan hisobda mablag' yetarli emas")
+                return self.form_invalid(form)
+
+            converted_amount = convert_currency(amount, from_locked.currency, to_locked.currency)
+
+            from_locked.balance -= amount
+            to_locked.balance += converted_amount
+            from_locked.save(update_fields=['balance', 'updated_at'])
+            to_locked.save(update_fields=['balance', 'updated_at'])
+
+            expense_comment = f"O‘tkazma -> {to_locked.name}"
+            income_comment = f"O‘tkazma <- {from_locked.name}"
+
+            if from_locked.currency != to_locked.currency:
+                rate_info = f"Konvertatsiya: {amount} {from_locked.currency} = {converted_amount} {to_locked.currency}"
+                expense_comment = f"{expense_comment}. {rate_info}"
+                income_comment = f"{income_comment}. {rate_info}"
+
+            if comment:
+                expense_comment = f"{expense_comment}. {comment}"
+                income_comment = f"{income_comment}. {comment}"
+
+            Transaction.objects.create(
+                user=self.request.user,
+                account=from_locked,
+                category=None,
+                transaction_type=TransactionType.EXPENSE,
+                amount=amount,
+                currency=from_locked.currency,
+                date=date,
+                comment=expense_comment,
+            )
+            Transaction.objects.create(
+                user=self.request.user,
+                account=to_locked,
+                category=None,
+                transaction_type=TransactionType.INCOME,
+                amount=converted_amount,
+                currency=to_locked.currency,
+                date=date,
+                comment=income_comment,
+            )
+
         return super().form_valid(form)

@@ -27,6 +27,9 @@
                 <a href="{% url 'transaction_add' %}" class="btn-neon">
                     <i class="fa-solid fa-plus me-2"></i> Yangi operatsiya
                 </a>
+                <a href="{% url 'transfer_add' %}" class="btn btn-outline-neon">
+                    <i class="fa-solid fa-right-left me-2"></i> O‘tkazma
+                </a>
             </div>
         </div>
     </div>
@@ -41,8 +44,16 @@
                 </div>
                 <span class="text-info small fw-medium">Jami qoldiq</span>
             </div>
-            <h3 class="fw-bold mb-1">{{ net_balance|floatformat:2 }} <span class="fs-6 fw-normal text-muted">UZS</span></h3>
-            <p class="text-muted small mb-0">Barcha hamyonlar bo'yicha</p>
+            <h3 class="fw-bold mb-2">{{ total_balance_uzs|floatformat:2 }} <span class="fs-6 fw-normal text-muted">UZS</span></h3>
+            <div class="text-muted small mb-1">Umumiy (UZS ekvivalent)</div>
+            <div class="small">
+                {% for item in balance_by_currency %}
+                    <div class="d-flex justify-content-between">
+                        <span class="text-muted">{{ item.currency }}</span>
+                        <span>{{ item.amount|floatformat:2 }}</span>
+                    </div>
+                {% endfor %}
+            </div>
         </div>
     </div>
 
@@ -125,7 +136,7 @@
                         <div>
                             <div class="fw-bold">{{ account.balance|floatformat:2 }}</div>
                             <div class="text-muted small">
-                                UZS 
+                                {{ account.currency }}
                                 <a href="{% url 'transaction_add' %}?account={{ account.id }}&type=INCOME" class="ms-2 text-success text-decoration-none" title="Pul kiritish">
                                     <i class="fa-solid fa-circle-plus"></i>
                                 </a>

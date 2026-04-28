@@ -87,7 +87,7 @@
                             <span class="text-muted small"><i class="fa-solid fa-credit-card me-1 opacity-50"></i> {{ tx.account.name }}</span>
                         </td>
                         <td class="text-end fw-bold {% if tx.transaction_type == 'INCOME' %}text-success{% else %}text-danger{% endif %}">
-                            {% if tx.transaction_type == 'INCOME' %}+{% else %}-{% endif %}{{ tx.amount|floatformat:2 }}
+                            {% if tx.transaction_type == 'INCOME' %}+{% else %}-{% endif %}{{ tx.amount|floatformat:2 }} {{ tx.currency }}
                         </td>
                     </tr>
                     {% empty %}

@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}O‘tkazma | FinTracker Pro{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center animate-fade-in">
+    <div class="col-md-6">
+        <div class="glass-card">
+            <div class="text-center mb-4">
+                <div class="p-3 bg-warning bg-opacity-10 rounded-circle d-inline-block mb-3">
+                    <i class="fa-solid fa-right-left text-warning fs-3"></i>
+                </div>
+                <h3 class="fw-bold">Hisoblar orasida o‘tkazma</h3>
+                <p class="text-muted">Bitta kartadan boshqasiga mablag‘ o‘tkazing</p>
+            </div>
+
+            <div class="alert alert-info small">
+                <div class="fw-semibold mb-1">Kurs bo‘yicha konvertatsiya ishlaydi</div>
+                <div class="mb-1">Kiritilgan summa <strong>jo‘natuvchi hisob valyutasida</strong> olinadi.</div>
+                {% for pair in transfer_rates %}
+                    <div>{{ pair.0 }} = {{ pair.1 }}</div>
+                {% endfor %}
+            </div>
+
+            <form method="post">
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger">{{ form.non_field_errors.0 }}</div>
+                {% endif %}
+
+                {% for field in form %}
+                    <div class="mb-4">
+                        <label class="form-label text-muted small fw-medium">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.errors %}
+                            <div class="text-danger small mt-1">{{ field.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+
+                <div class="d-grid gap-3 mt-5">
+                    <button type="submit" class="btn-neon">
+                        <i class="fa-solid fa-arrows-rotate me-2"></i> O‘tkazmani bajarish
+                    </button>
+                    <a href="{% url 'dashboard' %}" class="btn btn-outline-neon">
+                        Bekor qilish
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const dateInput = document.querySelector('input[type="datetime-local"]');
+        if (dateInput && !dateInput.value) {
+            const now = new Date();
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            dateInput.value = now.toISOString().slice(0, 16);
+        }
+    });
+</script>
+{% endblock %}
