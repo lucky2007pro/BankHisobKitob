@@ -151,7 +151,6 @@ class TransactionCreateView(LoginRequiredMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # Add categories data for dynamic filtering in JavaScript
         context['categories_data'] = list(Category.objects.values('id', 'name', 'type'))
         return context
 
